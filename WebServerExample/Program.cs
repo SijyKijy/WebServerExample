@@ -15,10 +15,31 @@ namespace Server
             IPEndPoint endpoint = new(IPAddress.Any, _port);
 
             socket.Bind(endpoint);
-            socket.Listen(4);
+            socket.Listen(1);
 
-            var responseSocket = socket.Accept();
+            while (true)
+            {
+                var responseSocket = socket.Accept();
 
+                Console.WriteLine($"{DateTime.Now}: {Decode(responseSocket)}");
+
+                SendHttp(responseSocket);
+
+                responseSocket.Close();
+            }
+        }
+
+        private static void SendHttp(Socket response)
+        {
+            const string headers = "HTTP/2.0 200 OK\r\nContent-Type: text/html\r\n\r\n";
+            const string content = "Hello world!";
+
+            response.Send(Encode(headers + content));
+        }
+
+
+        private static string Decode(Socket responseSocket)
+        {
             Span<byte> buffer = new(new byte[1024]);
             StringBuilder sb = new(responseSocket.Available);
 
@@ -28,7 +49,9 @@ namespace Server
                 sb.Append(Encoding.UTF8.GetString(buffer));
             } while (responseSocket.Available > 0);
 
-            Console.WriteLine(sb);
+            return sb.ToString();
         }
+
+        private static ReadOnlySpan<byte> Encode(string message) => Encoding.UTF8.GetBytes(message);
     }
 }
