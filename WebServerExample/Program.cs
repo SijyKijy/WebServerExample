@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using WebServerExample.Server;
 
 namespace Server
 {
@@ -13,15 +14,16 @@ namespace Server
         {
             Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IPEndPoint endpoint = new(IPAddress.Any, _port);
+            Reader reader = new();
 
             socket.Bind(endpoint);
-            socket.Listen(1);
+            socket.Listen(4);
 
             while (true)
             {
                 var responseSocket = socket.Accept();
 
-                Console.WriteLine($"{DateTime.Now}: {Decode(responseSocket)}");
+                reader.PrintData(responseSocket);
 
                 SendHttp(responseSocket);
 
@@ -38,19 +40,6 @@ namespace Server
         }
 
 
-        private static string Decode(Socket responseSocket)
-        {
-            Span<byte> buffer = new(new byte[1024]);
-            StringBuilder sb = new(responseSocket.Available);
-
-            do
-            {
-                responseSocket.Receive(buffer);
-                sb.Append(Encoding.UTF8.GetString(buffer));
-            } while (responseSocket.Available > 0);
-
-            return sb.ToString();
-        }
 
         private static ReadOnlySpan<byte> Encode(string message) => Encoding.UTF8.GetBytes(message);
     }
