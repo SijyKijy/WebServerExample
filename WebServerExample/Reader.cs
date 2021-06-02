@@ -6,7 +6,7 @@ namespace WebServerExample.Server
 {
     public class Reader
     {
-        private const int _bufferSize = 1024 * 4;
+        private const int _bufferSize = 1024;
 
         private readonly byte[] _buffer;
         private readonly char[] _charBuffer;
@@ -23,10 +23,11 @@ namespace WebServerExample.Server
             Span<char> chars = new(_charBuffer);
 
             Encoding enc = Encoding.UTF8;
+            var decoder = enc.GetDecoder();
             do
             {
                 responseSocket.Receive(buffer);
-                enc.GetDecoder().GetChars(buffer, chars, true);
+                decoder.GetChars(buffer, chars, false);
                 Console.Write(_charBuffer);
             } while (responseSocket.Available > 0);
         }
