@@ -8,19 +8,26 @@ namespace WebServerExample.Server
     {
         private const int _bufferSize = 1024 * 4;
 
+        private readonly byte[] _buffer;
+        private readonly char[] _charBuffer;
+
+        public Reader()
+        {
+            _buffer = new byte[_bufferSize];
+            _charBuffer = new char[_bufferSize];
+        }
+
         public void PrintData(Socket responseSocket)
         {
-            Span<byte> buffer = new(new byte[_bufferSize]);
-            Span<char> chars = new(new char[_bufferSize]);
+            Span<byte> buffer = new(_buffer);
+            Span<char> chars = new(_charBuffer);
 
             Encoding enc = Encoding.UTF8;
-
             do
             {
                 responseSocket.Receive(buffer);
                 enc.GetDecoder().GetChars(buffer, chars, true);
-
-                Console.WriteLine(chars.ToString());
+                Console.WriteLine(_charBuffer);
             } while (responseSocket.Available > 0);
         }
     }
