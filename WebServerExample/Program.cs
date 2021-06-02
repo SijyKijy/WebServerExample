@@ -8,7 +8,7 @@ namespace Server
 {
     internal class Program
     {
-        private static readonly int _port = 50501;
+        private const int _port = 50501;
 
         private static void Main(string[] args)
         {
@@ -38,8 +38,6 @@ namespace Server
 
             response.Send(Encode(headers + content));
         }
-
-
 
         private static ReadOnlySpan<byte> Encode(string message) => Encoding.UTF8.GetBytes(message);
     }
