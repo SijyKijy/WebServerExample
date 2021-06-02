@@ -27,7 +27,7 @@ namespace WebServerExample.Server
             {
                 responseSocket.Receive(buffer);
                 enc.GetDecoder().GetChars(buffer, chars, true);
-                Console.WriteLine(_charBuffer);
+                Console.Write(_charBuffer);
             } while (responseSocket.Available > 0);
         }
     }
